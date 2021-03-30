@@ -22,7 +22,8 @@ Your card number:
         self.balance = 0
         
     def create_card_number(self):
-        self.card_number = self.create_issuer_identification_number() + self.create_customer_account_number() + self.create_checksum()
+        self.account_identifier = self.create_issuer_identification_number() + self.create_customer_account_number()
+        self.card_number = self.account_identifier + self.create_checksum(self.account_identifier)
         return self.card_number
 
     def create_issuer_identification_number(self):
@@ -37,8 +38,18 @@ Your card number:
         random.shuffle(self.list_of_numbers)
         return ''.join(list(map(str, self.list_of_numbers)))
         
-    def create_checksum(self):
-        return str(random.randint(0, 9))
+    def create_checksum(self, account_identifier):
+        account_identifier = list(map(int, account_identifier))
+        for d in range(len(account_identifier)):
+            if d % 2 != 1:
+                account_identifier[d] = account_identifier[d] * 2
+
+        for e in range(len(account_identifier)):
+            if account_identifier[e] > 9:
+                account_identifier[e] = account_identifier[e] - 9
+
+        total = sum(account_identifier)
+        return str(10 - total % 10)
     
     def create_card_pin(self):
         self.card_pin = list()
@@ -68,15 +79,14 @@ Your card number:
 0. Exit
 """             )
 
-                # user_input = int(input())
+                user_input = int(input())
 
-                # if user_input == 1:
-                #     print('Balance: ' + str(self.balance))
-                # elif user_input == 2:
-                #     print("You have successfully logged out!")
-                #     break
+                if user_input == 1:
+                    print('Balance: ' + str(self.balance))
+                elif user_input == 2:
+                    print("You have successfully logged out!")
+                    break
 
-                # Apparently not needed for the exercise
         else:
             print("Wrong card number or PIN!")
             
@@ -87,8 +97,8 @@ user = User()
 
 while True:
     print("""
-1. Create an account, 
-2. Log into account, 
+1. Create an account 
+2. Log into account
 0. Exit
     """)
         
